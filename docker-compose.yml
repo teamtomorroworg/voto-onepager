@@ -1,0 +1,21 @@
+version: "3.3"
+
+services:
+  builder:
+    build: ./
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.voto_index.rule=Host(`voto.komunat.de`, `www.voto.komunat.de`)"
+      - "traefik.http.routers.voto_index.entrypoints=https"
+      - "traefik.http.routers.voto_index.tls=true"
+      - "traefik.http.routers.voto_index.tls.certresolver=mytlschallenge"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.voto_index-redirs.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.voto_index-redirs.entrypoints=http"
+      - "traefik.http.routers.voto_index-redirs.middlewares=redirect-to-https"
+    networks:
+      - traefik_websecure
+networks:
+  traefik_websecure:
+    external: true
